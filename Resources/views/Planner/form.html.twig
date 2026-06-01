@@ -1,0 +1,81 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}marketingplanner{% endblock %}
+
+{% block headerTitle %}
+    <i class="ri-calendar-line"></i>
+    {% if isNew %}Add Planning Item{% else %}Edit Planning Item{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="pa-md">
+    <div class="row">
+        <div class="col-sm-8 col-sm-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-body pa-lg">
+
+                    {{ form_start(form, {attr: {class: 'form-horizontal'}}) }}
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{{ 'mautic.marketing_planner.item.name'|trans }}</label>
+                        <div class="col-sm-9">{{ form_widget(form.name) }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{{ 'mautic.marketing_planner.item.description'|trans }}</label>
+                        <div class="col-sm-9">{{ form_widget(form.description) }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{{ 'mautic.marketing_planner.item.deadline'|trans }} <span class="text-danger">*</span></label>
+                        <div class="col-sm-4">{{ form_widget(form.deadline) }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{{ 'mautic.marketing_planner.item.assigned_to'|trans }}</label>
+                        <div class="col-sm-5">{{ form_widget(form.assignedTo) }}</div>
+                    </div>
+
+                    {% if not isNew %}
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{{ 'mautic.marketing_planner.item.done_at'|trans }}</label>
+                        <div class="col-sm-4">
+                            {{ form_widget(form.doneAt) }}
+                            <p class="help-block">Leave empty if not yet done.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if not isNew %}
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Created</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static text-muted">{{ item.createdAt|date('d M Y, H:i') }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group mb-0">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            {{ form_widget(form.buttons) }}
+                        </div>
+                    </div>
+
+                    {{ form_end(form) }}
+
+                </div>
+            </div>
+
+            {% if not isNew %}
+            <div class="text-right">
+                <form method="post" action="{{ path('mautic_marketing_planner_delete', {id: item.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?')">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="ri-delete-bin-line"></i> Delete this item
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

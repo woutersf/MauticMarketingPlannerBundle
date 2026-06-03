@@ -8,6 +8,7 @@ Created by [Dropsolid](https://dropsolid.com) · [Frederik Wouters](https://fred
 
 ## Screenshots
 
+![Menu](Assets/img/menu.png)
 ![Month view](Assets/img/month-view.png)
 ![List view](Assets/img/list-view.png)
 

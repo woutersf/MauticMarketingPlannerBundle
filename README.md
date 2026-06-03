@@ -26,24 +26,13 @@ Created by [Dropsolid](https://dropsolid.com) · [Frederik Wouters](https://fred
 1. Copy the plugin into `docroot/plugins/MauticMarketingPlannerBundle/`
 2. Clear the cache: `php bin/console cache:clear`
 3. Install the plugin: `php bin/console mautic:plugins:install`
-4. Create the database table:
+4. Run the bundled migration to create the table:
 
-```sql
-CREATE TABLE IF NOT EXISTS `mtc_planner_items` (
-    `id`             INT NOT NULL AUTO_INCREMENT,
-    `name`           VARCHAR(255) NOT NULL,
-    `description`    LONGTEXT,
-    `created_at`     DATETIME NOT NULL,
-    `deadline`       DATE NOT NULL,
-    `done_at`        DATE DEFAULT NULL,
-    `assigned_to_id` INT DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    INDEX `idx_planner_deadline` (`deadline`),
-    INDEX `idx_planner_assigned` (`assigned_to_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```bash
+php bin/console doctrine:migrations:migrate --no-interaction
 ```
 
-*(Replace `mtc_` with your configured table prefix if different.)*
+The migration is bundled inside the plugin (`Migration/Version20260601120000.php`) and is auto-registered via the bundle's DependencyInjection extension. It creates the `planner_items` table and respects the configured Mautic table prefix.
 
 ---
 
@@ -54,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `mtc_planner_items` (
 | View | Description |
 |---|---|
 | List | All items sorted by deadline. Overdue dates highlighted red. |
-| Month | Calendar grid (Mon–Sun). Items appear as chips on their deadline day. |
+| Month | Calendar grid (Mon-Sun). Items appear as chips on their deadline day. |
 | Year | All 12 months, each listing that month's items. |
 
 **Planning items** have:
@@ -80,10 +69,4 @@ The planner is accessible via the calendar icon at the bottom of the left sideba
 
 ## Demo data
 
-A migration at `app/migrations/Version20260601120000.php` creates the table and inserts 14 sample items across June–August 2026.
-
-Run it with:
-
-```bash
-php bin/console doctrine:migrations:migrate --no-interaction
-```
+The migration inserts 14 sample planning items spread across June-August 2026 so the calendar is populated immediately after install.

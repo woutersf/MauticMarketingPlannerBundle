@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `mtc_planner_items` (
 
 ## Features
 
-**Three views** — switch with the toolbar buttons:
+**Three views** - switch with the toolbar buttons:
 
 | View | Description |
 |---|---|
@@ -63,11 +63,11 @@ CREATE TABLE IF NOT EXISTS `mtc_planner_items` (
 - Assigned to (any Mautic user)
 - Done date (set via the done button or manually in the edit form)
 
-**Done toggle** — one-click mark done/undo from the list and year views. Done items appear greyed out with a strikethrough in all views.
+**Done toggle** - one-click mark done/undo from the list and year views. Done items appear greyed out with a strikethrough in all views.
 
-**Shared** — all logged-in users with the appropriate permission see and can manage all items.
+**Shared** - all logged-in users with the appropriate permission see and can manage all items.
 
-**Permissions** — the plugin registers `plugin:marketingplanner:items` in Mautic's role system. Configure per role at Admin → Roles.
+**Permissions** - the plugin registers `plugin:marketingplanner:items` in Mautic's role system. Configure per role at Admin → Roles.
 
 ---
 

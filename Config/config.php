@@ -52,9 +52,8 @@ return [
     'services' => [
         'forms' => [
             'mautic.marketing_planner.form.type.item' => [
-                'class'     => \MauticPlugin\MauticMarketingPlannerBundle\Form\Type\PlannerItemType::class,
-                'arguments' => ['doctrine.orm.entity_manager'],
-                'tags'      => ['form.type'],
+                'class' => \MauticPlugin\MauticMarketingPlannerBundle\Form\Type\PlannerItemType::class,
+                'tags'  => ['form.type'],
             ],
         ],
         'permissions' => [

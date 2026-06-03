@@ -1,197 +1,88 @@
 # MauticMarketingPlannerBundle
 
-A shared marketing calendar plugin for [Mautic](https://www.mautic.org/) that lets your whole team plan, track and manage marketing activities in one place.
+A shared marketing calendar plugin for Mautic. Plan and track marketing activities across your team with month, year and list views.
 
-![Marketing Planner](https://via.placeholder.com/900x400/4e5d6c/ffffff?text=Marketing+Planner+Calendar)
+Created by [Dropsolid](https://dropsolid.com) · [Frederik Wouters](https://frederikwouters.be/)
 
 ---
 
-## Features
+## Screenshots
 
-- **Month view** — full calendar grid (Mon–Sun weeks) with items on their deadline day
-- **Year view** — month-by-month overview with item counts and quick links
-- **List view** — all tasks sorted by deadline; overdue items highlighted in red
-- **Quick done toggle** — mark any item done (or undo) with one click from any view
-- **Shared** — all logged-in users see and can manage all items
-- **Assignable** — items can be assigned to any Mautic user
-- **Permissions** — plugs into Mautic's role system (`plugin:marketingplanner:items`)
-- **Demo data** — ships with 14 sample items across June–August so you see it working immediately
-- **Main menu** — calendar icon at the bottom of the left navigation
+![Month view](Assets/img/month-view.png)
+![List view](Assets/img/list-view.png)
 
 ---
 
 ## Requirements
 
-| Requirement | Version |
-|---|---|
-| Mautic | 4.x / 5.x |
-| PHP | 8.0+ |
-| MySQL / MariaDB | 5.7+ / 10.3+ |
+- Mautic 5.x / 7.x
+- PHP 8.0+
 
 ---
 
 ## Installation
 
-### 1. Copy the plugin
+1. Copy the plugin into `docroot/plugins/MauticMarketingPlannerBundle/`
+2. Clear the cache: `php bin/console cache:clear`
+3. Install the plugin: `php bin/console mautic:plugins:install`
+4. Create the database table:
 
-```bash
-cp -r MauticMarketingPlannerBundle /path/to/mautic/docroot/plugins/
+```sql
+CREATE TABLE IF NOT EXISTS `mtc_planner_items` (
+    `id`             INT NOT NULL AUTO_INCREMENT,
+    `name`           VARCHAR(255) NOT NULL,
+    `description`    LONGTEXT,
+    `created_at`     DATETIME NOT NULL,
+    `deadline`       DATE NOT NULL,
+    `done_at`        DATE DEFAULT NULL,
+    `assigned_to_id` INT DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_planner_deadline` (`deadline`),
+    INDEX `idx_planner_assigned` (`assigned_to_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### 2. Clear cache
+*(Replace `mtc_` with your configured table prefix if different.)*
 
-```bash
-php bin/console cache:clear
-```
+---
 
-### 3. Install the plugin
+## Features
 
-```bash
-php bin/console mautic:plugins:install
-```
+**Three views** — switch with the toolbar buttons:
 
-### 4. Create the database table
+| View | Description |
+|---|---|
+| List | All items sorted by deadline. Overdue dates highlighted red. |
+| Month | Calendar grid (Mon–Sun). Items appear as chips on their deadline day. |
+| Year | All 12 months, each listing that month's items. |
 
-The plugin ships with a Doctrine migration at `app/migrations/Version20260601120000.php`.  
-Copy it to your Mautic installation's `app/migrations/` directory, then run:
+**Planning items** have:
+- Name
+- Description
+- Deadline (the date shown in the calendar)
+- Assigned to (any Mautic user)
+- Done date (set via the done button or manually in the edit form)
+
+**Done toggle** — one-click mark done/undo from the list and year views. Done items appear greyed out with a strikethrough in all views.
+
+**Shared** — all logged-in users with the appropriate permission see and can manage all items.
+
+**Permissions** — the plugin registers `plugin:marketingplanner:items` in Mautic's role system. Configure per role at Admin → Roles.
+
+---
+
+## Navigation
+
+The planner is accessible via the calendar icon at the bottom of the left sidebar, or directly at `/s/planner`.
+
+---
+
+## Demo data
+
+A migration at `app/migrations/Version20260601120000.php` creates the table and inserts 14 sample items across June–August 2026.
+
+Run it with:
 
 ```bash
 php bin/console doctrine:migrations:migrate --no-interaction
 ```
-
-> **Alternatively**, if migrations are tricky in your setup, run the raw SQL directly:
->
-> ```sql
-> CREATE TABLE IF NOT EXISTS `mtc_planner_items` (
->     `id`              INT NOT NULL AUTO_INCREMENT,
->     `name`            VARCHAR(255) NOT NULL,
->     `description`     LONGTEXT,
->     `created_at`      DATETIME NOT NULL,
->     `deadline`        DATE NOT NULL,
->     `done_at`         DATE DEFAULT NULL,
->     `assigned_to_id`  INT DEFAULT NULL,
->     PRIMARY KEY (`id`),
->     INDEX `idx_planner_deadline` (`deadline`),
->     INDEX `idx_planner_assigned` (`assigned_to_id`)
-> ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-> ```
-> *(Replace `mtc_` with your configured table prefix.)*
-
----
-
-## Usage
-
-Navigate to `/s/planner` or click the **calendar icon** at the bottom of the left sidebar.
-
-### Views
-
-| View | URL | Description |
-|---|---|---|
-| Month | `/s/planner?view=month&year=2026&month=6` | Calendar grid, Mon–Sun weeks |
-| Year | `/s/planner?view=year&year=2026` | All 12 months with activities |
-| List | `/s/planner?view=list` | All items sorted by deadline |
-
-Use **← →** arrows to navigate between months/years. The **Today** button returns to the current month.
-
-### Adding items
-
-Click **Add item** (top right of any view) or go to `/s/planner/new`.
-
-Each item has:
-
-| Field | Required | Notes |
-|---|---|---|
-| Name | Yes | Short task label shown in the calendar |
-| Description | No | Longer free-text notes |
-| Deadline | Yes | The date shown in the calendar |
-| Assigned To | No | Any Mautic user |
-| Done Date | No | Set automatically via the Done button; editable in the form |
-
-### Marking items done
-
-Click the **✓** button next to any item in the List or Year view. Done items appear greyed out with a strikethrough. Click again to undo.
-
----
-
-## Permissions
-
-The plugin registers the permission group `plugin:marketingplanner:items` in Mautic's role system.
-
-Standard permission levels are available:
-- `viewown` / `viewother`
-- `editown` / `editother`
-- `create`
-- `deleteown` / `deleteother`
-
-By default, grant all levels to the roles that should have full access. Configure at **Admin → Roles**.
-
-> The main menu item only appears for users who have `viewother` permission.
-
----
-
-## Development
-
-### Run locally with DDEV
-
-```bash
-ddev start
-ddev exec php bin/console cache:clear
-ddev exec php bin/console mautic:plugins:install
-ddev exec php bin/console mautic:uli 1   # get a one-time login link
-```
-
-### File structure
-
-```
-MauticMarketingPlannerBundle/
-├── Config/
-│   └── config.php                        Routes, menu, services
-├── Controller/
-│   └── PlannerController.php             All actions + calendar helpers
-├── Entity/
-│   ├── PlannerItem.php                   Doctrine entity (ClassMetadataBuilder)
-│   └── PlannerItemRepository.php         Query methods
-├── Form/
-│   └── Type/
-│       └── PlannerItemType.php           Symfony form type
-├── Integration/
-│   └── MarketingPlannerIntegration.php   Mautic integration (icon in plugin list)
-├── Security/
-│   └── Permissions/
-│       └── PlannerPermissions.php        Mautic role permissions
-├── Resources/
-│   └── views/
-│       └── Planner/
-│           ├── index.html.twig           Calendar overview (all 3 views)
-│           └── form.html.twig            New / edit form
-└── README.md
-```
-
-The migration lives in the parent Mautic installation at:
-```
-app/migrations/Version20260601120000.php
-```
-
----
-
-## Changelog
-
-### 1.0.0 (2026-06-01)
-- Initial release
-- Month, Year and List calendar views
-- CRUD for planning items
-- Quick done toggle
-- Demo data migration
-- Mautic role permissions
-
----
-
-## License
-
-MIT — see [LICENSE](LICENSE)
-
----
-
-## Author
-
-Built by [Dropsolid](https://dropsolid.com) as part of the Mautic AI & productivity plugin suite.

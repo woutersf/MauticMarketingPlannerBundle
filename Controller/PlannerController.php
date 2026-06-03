@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticMarketingPlannerBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Controller\FormController;
 use MauticPlugin\MauticMarketingPlannerBundle\Entity\PlannerItem;
 use MauticPlugin\MauticMarketingPlannerBundle\Form\Type\PlannerItemType;
@@ -12,6 +13,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PlannerController extends FormController
 {
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            'doctrine.orm.entity_manager' => EntityManagerInterface::class,
+        ]);
+    }
+
+    private function em(): EntityManagerInterface
+    {
+        return $this->container->get('doctrine.orm.entity_manager');
+    }
+
     // -------------------------------------------------------------------------
     // INDEX — calendar overview
     // -------------------------------------------------------------------------
@@ -22,7 +35,7 @@ class PlannerController extends FormController
         $year  = max(2000, min(2100, (int) $request->query->get('year', (int) date('Y'))));
         $month = max(1, min(12, (int) $request->query->get('month', (int) date('n'))));
 
-        $em   = $this->getDoctrine()->getManager();
+        $em   = $this->em();
         $repo = $em->getRepository(PlannerItem::class);
 
         $viewParams = [
@@ -82,7 +95,7 @@ class PlannerController extends FormController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em();
             $em->persist($item);
             $em->flush();
 
@@ -111,7 +124,7 @@ class PlannerController extends FormController
 
     public function editAction(Request $request, int $id): Response
     {
-        $em   = $this->getDoctrine()->getManager();
+        $em   = $this->em();
         $item = $em->getRepository(PlannerItem::class)->find($id);
 
         if (!$item) {
@@ -149,7 +162,7 @@ class PlannerController extends FormController
 
     public function deleteAction(Request $request, int $id): Response
     {
-        $em   = $this->getDoctrine()->getManager();
+        $em   = $this->em();
         $item = $em->getRepository(PlannerItem::class)->find($id);
 
         if ($item) {
@@ -168,7 +181,7 @@ class PlannerController extends FormController
 
     public function doneAction(Request $request, int $id): Response
     {
-        $em   = $this->getDoctrine()->getManager();
+        $em   = $this->em();
         $item = $em->getRepository(PlannerItem::class)->find($id);
 
         if ($item) {
